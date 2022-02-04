@@ -100,6 +100,17 @@ extension ModelField: SQLColumn {
 
 }
 
+// MARK: Array + ModelField: SQLColumn
+extension Array where Element == ModelField {
+    /// The name of the fields as SQL columns.
+    var sqlName: String {
+        if self.count == 1, let field = self.first {
+            return field.sqlName
+        }
+        return "(\(self.map { $0.sqlName }.joined(separator: ", ")))"
+    }
+}
+
 extension ModelSchema {
 
     /// Filter the fields that represent actual columns on the `Model` SQL table. The definition of
@@ -111,7 +122,9 @@ extension ModelSchema {
     }
 
     /// Filter the fields that represent foreign keys.
-    var foreignKeys: [ModelField] {
-        sortedFields.filter { $0.isForeignKey }
+    var foreignKeys: [ModelName: [ModelField]] {
+        let foreignKeyFields = sortedFields.filter { $0.isForeignKey }
+        return [ModelName: [ModelField]](grouping: foreignKeyFields,
+                                         by: { $0.requiredAssociatedModelName })
     }
 }

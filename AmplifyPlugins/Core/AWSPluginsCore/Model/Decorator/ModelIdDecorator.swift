@@ -21,7 +21,7 @@ public struct ModelIdDecorator: ModelBasedGraphQLDocumentDecorator {
                 fields[key] = model[key] as? String
             }
         }
-        self.init(id: model.id, fields: fields)
+        self.init(id: model.identifier.stringValue, fields: fields)
     }
 
     public init(id: Model.Identifier, fields: [String: String]? = nil) {
